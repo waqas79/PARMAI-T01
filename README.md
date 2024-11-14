@@ -3,6 +3,6 @@
 
 # Git Repo 
 cd /home/waqas/Documents/MS_AI/01_ParaComp/Task1/PARMAI-T01
-git add .
-git commit -m "write Here what ist changed" 
-git push
+  git add .
+  git commit -m "write Here what ist changed" 
+  git push
