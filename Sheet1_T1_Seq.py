@@ -1,65 +1,37 @@
 import time
-from multiprocessing import Pool
+import random
 
-array_x = [2, 4, 6, 8, 1, 3, 5, 7]
-print("Array_x:", array_x)
+#array_x = [2, 4, 6, 8, 1, 3, 5, 7]
+array_x = [random.randint(1, 9999) for _ in range(999)]
 
 # Function to calculate the prefix sum in parallel
-def partial_sum(args):
-    arr, start, step = args
-    """ Helper function to compute partial sums in parallel """
-    for i in range(start, len(arr), step):
-        if i + step // 2 < len(arr):
-            arr[i] += arr[i + step // 2]
-    return arr
+def Array_prefix_sum(array_x):
 
-def parallel_prefix_sum(array_x):
-    array_sum = array_x[:]  # Copy the input array to work on
-    time_steps = 0           # Counter for time steps
-    operations = 0           # Counter for operations
-    processors = []          # Track used CPUs (equal to number of parallel jobs)
+    seq_sum = [] # blank list for saving sum
+    sum_counter = 0 # init temp_sum
+    time_steps = 0
+    operations = 0
+    for num in array_x:
+        sum_counter += num   # adding ( operation +1)
+        seq_sum.append(sum_counter) # append ( operation 1+)
+        time_steps += 1 # each cycle is a time stemp
+        operations += 2 # one cycle 2 operations
+    return seq_sum,time_steps,operations
+result = Array_prefix_sum(array_x)
 
-    n = len(array_sum)
-    step = 1  # Initial step size for parallel processing
 
-    # Parallel reduction phase
-    while step < n:
-        time_steps += 1
-        operations += n // step  # Every element addition is counted as an operation
-        
-        # Properly format the arguments for partial_sum as tuples
-        tasks = [(array_sum, i, step * 2) for i in range(0, step)]
-        
-        # Using pool.map to distribute tasks
-        with Pool() as pool:
-            processors.append(pool._processes)
-            pool.map(partial_sum, tasks)
-        
-        step *= 2  # Increase step size for next iteration
-
-    # Down-sweep phase (can be parallelized but simpler in sequence here)
-    for i in range(n - 1, 0, -1):
-        array_sum[i] += array_sum[i - 1]
-        operations += 1  # Count the down-sweep additions
-
-    return array_sum, time_steps, operations, max(processors)
-
-# Record start time
 start_time = time.time()
-
-# Execute the function and capture the results
-result, time_steps, operations, required_cpus = parallel_prefix_sum(array_x)
-
-# Record end time
+result_seq, time_steps, operations = Array_prefix_sum(array_x)
 end_time = time.time()
 
-# Calculate the duration in milliseconds
-parallel_deltaTime = (end_time - start_time) * 1e3  # Convert time to milliseconds
+
+
 
 # Display results
 print("Input Array_x:", array_x)
 print("Prefix sum of array_x:", result)
 print("Time steps:", time_steps)
 print("Operations:", operations)
-print("Number of required CPUs:", required_cpus)
-print("Processing time (ms):", parallel_deltaTime)
+print("Number of CPUs:", "1 - Seq Programm")
+seq_time = (end_time - start_time) * 1000
+print("Sequential:", result_seq, f"Time: {seq_time:.2f} ms")
