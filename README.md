@@ -6,4 +6,6 @@ git commit -m "AAAAAAAAAAAAAAAAA"
 git push
 
 #Installation
+sudo apt install python3-dask
+sudo apt install python3-multiprocess
 
