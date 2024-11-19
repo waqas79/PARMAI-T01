@@ -11,7 +11,7 @@ def up_sweep_chunk(chunk):
         for i in range(2**d, n, 2**(d + 1)):  # Update each node in the tree
             chunk[i] += chunk[i - 2**d]
     return chunk
-
+# infra-Tect
 # Down-sweep phase for calculating the final prefix sum
 def down_sweep_chunk(chunk):
     n = len(chunk)
