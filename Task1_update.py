@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 # Sequential Prefix Sum Algorithm
 def sequential_prefix_sum(x):
     n = len(x)
+    sequential_steps = 0
     # Initialize the prefix sum array
     S = np.zeros(n, dtype=int)
     
@@ -15,8 +16,9 @@ def sequential_prefix_sum(x):
     # Compute the prefix sum for the rest of the elements
     for i in range(1, n):
         S[i] = S[i - 1] + x[i]
+        sequential_steps += 1
     
-    return S
+    return S,sequential_steps
 
 # Parallel Prefix Sum Algorithm using up-sweep and down-sweep
 def up_sweep(x, start, step):
@@ -51,27 +53,29 @@ def parallel_prefix_sum(arr):
         chunks = [future.result() for future in futures]
 
     # Step 2: Adjust for carry-over between chunks
+    parallel_steps = 0
     for i in range(1, len(chunks)):
         # Add the last element of the previous chunk to all elements in the current chunk
         carry = chunks[i-1][-1]
         for j in range(len(chunks[i])):
             chunks[i][j] += carry
+            parallel_steps += 1
 
     # Step 3: Merge the chunks into a final result
     result = np.concatenate(chunks)
-    return result
+    return result,parallel_steps
 # Test data
-x = np.array([2, 4, 6, 8, 1, 3, 5, 7])
+x = [2, 4, 6, 8, 1, 3, 5, 7]
 
 # Get results from both algorithms
 
-result_sequential = sequential_prefix_sum(x)
-result_parallel = parallel_prefix_sum(x)
+result_sequential,sequential_steps = sequential_prefix_sum(x)
+result_parallel,parallel_steps = parallel_prefix_sum(x)
 
 # Print results (optional)
 print("__input___:", x)
-print("Sequential Prefix Sum:", result_sequential)
-print("Parallel Prefix Sum:", result_parallel)
+print("Sequential Prefix Sum:",sequential_steps, result_sequential)
+print("Parallel Prefix Sum:",parallel_steps, result_parallel)
 
 # Plotting
 plt.figure(figsize=(10, 6))
