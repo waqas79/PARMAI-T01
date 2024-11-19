@@ -1,4 +1,9 @@
 import time
+import multiprocessing
+import random
+from multiprocessing import Pool
+import numpy as np
+
 def prefix_sum_sequential(array_x):
     prefix_sum = []
     sum_counter = 0
@@ -31,17 +36,20 @@ def parallel_prefix_sum(arr):
     # Combine the results from both halves
     return left_prefix_sum + right_prefix_sum
 
-# Example usage
+
 if __name__ == '__main__':
-    x = [2, 4, 6, 8, 1, 3, 5, 7]
+    x = [random.randint(1, 999) for _ in range(9)] # [2, 4, 6, 8, 1, 3, 5, 7]
     start_time = time.time()
-    print("Sequential result:", prefix_sum_sequential(x))
+    Seq_results = prefix_sum_sequential(x)
+    #print("Sequential result:", Seq_results)
     end_time =  time.time()
-    seq_time = (end_time - start_time) * 10
+    seq_time = (end_time - start_time) * 1000
     print("seq time : ",seq_time)
     
-    start_time = time.time()
-    print("Parallel result:", parallel_prefix_sum(x))
-    end_time =  time.time()
-    Para_time = (end_time - start_time) * 10
-    print ("Para-Time", Para_time)
+    p_start_time = time.time()
+    with multiprocessing.Pool() as pool:
+        results = pool.map(parallel_prefix_sum, [x])
+       # print("Parallel result:", results)
+    p_end_time =  time.time()
+    Para_time = (p_end_time - p_start_time) * 1000
+    print ("Para-Time : ", Para_time)
