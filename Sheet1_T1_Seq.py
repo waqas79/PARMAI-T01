@@ -2,7 +2,7 @@ import time
 import random
 
 #array_x = [2, 4, 6, 8, 1, 3, 5, 7]
-array_x = [random.randint(1, 9999) for _ in range(999)]
+array_x = [random.randint(1, 99) for _ in range(5)]
 
 # Function to calculate the prefix sum in parallel
 def Array_prefix_sum(array_x):

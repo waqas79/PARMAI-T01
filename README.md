@@ -6,9 +6,13 @@ git add .
 git commit -m "AAAAAAAAAAAAAAAAA"
 git push
 
-#Installation
+#Installation-Linux
 sudo apt install python3-dask
 sudo apt install python3-multiprocess
+#Installation-Windows_VSCode
+  pip install numpy
+  pip instal desk
+
 
 =======
   git add .
