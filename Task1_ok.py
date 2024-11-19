@@ -1,3 +1,8 @@
+
+"""
+This script calculates the factorial of a number.
+"""
+
 import time
 import multiprocessing
 import random
