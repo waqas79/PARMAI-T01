@@ -1,14 +1,21 @@
-import time
-import numpy as np
+import time # for time Stemps ... 
+import numpy as np  
 import matplotlib.pyplot as plt
 import random
+import numpy as np
+import os
+import multiprocessing
+from joblib import Parallel, delayed
+def get_system_info():
+    num_cores = os.cpu_count()  # Total number of cores
+    num_physical_cores = multiprocessing.cpu_count()  # Total physical processors
+    print(f"Total Number of Cores: {num_cores}")
+    print(f"Total Number of Physical Processors: {num_physical_cores}")
+get_system_info()
+
+
 input_Array = [2, 4, 6, 8, 1, 3, 5, 7]
 array_lenth = len(input_Array)
-
-
-
-from joblib import Parallel, delayed
-
 
 
 

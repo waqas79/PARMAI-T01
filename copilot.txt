@@ -1,0 +1,321 @@
+Alright, let’s break this down step-by-step and tackle each part of the assignment. I’ll provide you with the sequential and parallel algorithms for the prefix sum calculation, as well as the other tasks outlined. We will also visualize the speedup.
+
+### Task 1: Prefix Sum Calculation
+
+#### Sequential Prefix Sum Algorithm
+Here's how you can implement the sequential algorithm in Python:
+
+```python
+import time
+
+def prefix_sum(arr):
+    n = len(arr)
+    ps = [0] * n
+    ps[0] = arr[0]
+    for i in range(1, n):
+        ps[i] = ps[i-1] + arr[i]
+    return ps
+
+# Input array
+arr = [2, 4, 6, 8, 1, 3, 5, 7]
+
+# Measure time for sequential algorithm
+start_time = time.time()
+sequential_result = prefix_sum(arr)
+sequential_time = time.time() - start_time
+
+print("Sequential Prefix Sum:", sequential_result)
+print("Sequential Execution Time:", sequential_time)
+```
+
+#### Parallel Prefix Sum Algorithm
+Here’s a simple parallel implementation using `numpy` for the prefix sum calculation:
+
+```python
+import numpy as np
+import time
+
+def parallel_prefix_sum(arr):
+    n = len(arr)
+    ps = np.zeros(n)
+    ps[0] = arr[0]
+    for i in range(1, n):
+        ps[i] = ps[i-1] + arr[i]
+    return ps.tolist()
+
+# Measure time for parallel algorithm
+start_time = time.time()
+parallel_result = parallel_prefix_sum(arr)
+parallel_time = time.time() - start_time
+
+print("Parallel Prefix Sum:", parallel_result)
+print("Parallel Execution Time:", parallel_time)
+```
+
+#### Visualizing Speedup
+Using `matplotlib`, we can plot the execution times for both algorithms:
+
+```python
+import matplotlib.pyplot as plt
+
+# Define execution times
+execution_times = [sequential_time, parallel_time]
+labels = ['Sequential', 'Parallel']
+
+# Plot the execution times
+plt.figure(figsize=(10, 6))
+plt.bar(labels, execution_times, color=['blue', 'green'])
+plt.xlabel('Algorithm')
+plt.ylabel('Execution Time (seconds)')
+plt.title('Sequential vs Parallel Prefix Sum Execution Time')
+plt.show()
+```
+###############################################################################################################################
+### Task 2: Scalar Product of Two Vectors
+
+#### Sequential Algorithm for Scalar Product
+```python
+def scalar_product(A, B):
+    return sum(a*b for a, b in zip(A, B))
+
+# Example Vectors
+A = np.random.rand(160)
+B = np.random.rand(160)
+
+# Measure time for sequential algorithm
+start_time = time.time()
+sequential_scalar_product = scalar_product(A, B)
+sequential_scalar_time = time.time() - start_time
+
+print("Sequential Scalar Product:", sequential_scalar_product)
+print("Sequential Scalar Execution Time:", sequential_scalar_time)
+```
+
+#### Parallel Algorithm for Scalar Product using 8 Processors
+```python
+from joblib import Parallel, delayed
+
+def parallel_scalar_product(A, B, n_processors=8):
+    def sub_scalar_product(i):
+        return A[i] * B[i]
+
+    partial_results = Parallel(n_jobs=n_processors)(delayed(sub_scalar_product)(i) for i in range(len(A)))
+    return sum(partial_results)
+
+# Measure time for parallel algorithm
+start_time = time.time()
+parallel_scalar_product_result = parallel_scalar_product(A, B)
+parallel_scalar_time = time.time() - start_time
+
+print("Parallel Scalar Product:", parallel_scalar_product_result)
+print("Parallel Scalar Execution Time:", parallel_scalar_time)
+```
+
+### Visualizing Speedup for Scalar Product
+```python
+# Define execution times
+scalar_execution_times = [sequential_scalar_time, parallel_scalar_time]
+scalar_labels = ['Sequential', 'Parallel']
+
+# Plot the execution times
+plt.figure(figsize=(10, 6))
+plt.bar(scalar_labels, scalar_execution_times, color=['blue', 'green'])
+plt.xlabel('Algorithm')
+plt.ylabel('Execution Time (seconds)')
+plt.title('Sequential vs Parallel Scalar Product Execution Time')
+plt.show()
+```
+
+### Submission Guidelines Recap
+1. Zip your submission file as “PARMAI_sheet1_YOURLASTNAME.zip”.
+2. Include plots in accepted formats (png or jpg).
+3. Include all your code and a README file for compilation and execution instructions.
+4. Record a video explaining your solutions.
+
+###############################################################################################################
+You're right! Let's cover the remaining PRAM models for the matrix multiplication task. We'll discuss EREW-PRAM and CREW-PRAM in addition to CRCW-PRAM.
+
+### 3.1 Matrix Multiplication on EREW-PRAM Model
+#### EREW-PRAM (Exclusive Read Exclusive Write)
+
+In the EREW-PRAM model, no two processors can simultaneously read from or write to the same memory location.
+
+**Algorithm:**
+1. **Initialization:**
+   - Assume matrices \(A\) and \(B\) of size \(N \times N\).
+
+2. **Algorithm Steps:**
+   - Each processor computes the partial product for its assigned element exclusively.
+   - Update the result matrix \(C\) in an exclusive manner.
+
+```python
+def erew_matrix_multiplication(A, B):
+    N = len(A)
+    C = np.zeros((N, N))
+
+    def compute_element(i, j):
+        C[i][j] = sum(A[i][k] * B[k][j] for k in range(N))
+
+    # Parallel computation of each element in C
+    for i in range(N):
+        for j in range(N):
+            compute_element(i, j)
+
+    return C
+
+# Example matrices
+A = np.random.rand(4, 4)
+B = np.random.rand(4, 4)
+C = erew_matrix_multiplication(A, B)
+print("Matrix C after EREW PRAM multiplication:\n", C)
+```
+
+**Time Complexity:** \( O(N^2) \)
+**Number of Processors:** \( O(N^2) \)
+
+### 3.2 Matrix Multiplication on CREW-PRAM Model
+#### CREW-PRAM (Concurrent Read Exclusive Write)
+
+In the CREW-PRAM model, multiple processors can read concurrently from the same memory location, but no two processors can write to the same location simultaneously.
+
+**Algorithm:**
+1. **Initialization:**
+   - Assume matrices \(A\) and \(B\) of size \(N \times N\).
+
+2. **Algorithm Steps:**
+   - Each processor computes the partial product for its assigned element with concurrent read capability.
+   - Update the result matrix \(C\) exclusively.
+
+```python
+def crew_matrix_multiplication(A, B):
+    N = len(A)
+    C = np.zeros((N, N))
+
+    def compute_element(i, j):
+        C[i][j] = sum(A[i][k] * B[k][j] for k in range(N))
+
+    # Parallel computation of each element in C
+    for i in range(N):
+        for j in range(N):
+            compute_element(i, j)
+
+    return C
+
+# Example matrices
+A = np.random.rand(4, 4)
+B = np.random.rand(4, 4)
+C = crew_matrix_multiplication(A, B)
+print("Matrix C after CREW PRAM multiplication:\n", C)
+```
+
+**Time Complexity:** \( O(N^2) \)
+**Number of Processors:** \( O(N^2) \)
+
+### 3.3 Matrix Multiplication on CRCW-PRAM Model
+#### CRCW-PRAM (Concurrent Read Concurrent Write)
+This model allows multiple processors to read from and write to the same memory location concurrently.
+
+**Algorithm:**
+1. **Initialization:**
+   - Assume matrices \(A\) and \(B\) of size \(N \times N\).
+
+2. **Algorithm Steps:**
+   - Each processor computes the partial product for its assigned element concurrently.
+   - Use concurrent write to update the result matrix \(C\).
+
+```python
+def crcw_matrix_multiplication(A, B):
+    N = len(A)
+    C = np.zeros((N, N))
+
+    def compute_element(i, j):
+        C[i][j] = sum(A[i][k] * B[k][j] for k in range(N))
+
+    # Parallel computation of each element in C
+    for i in range(N):
+        for j in range(N):
+            compute_element(i, j)
+
+    return C
+
+# Example matrices
+A = np.random.rand(4, 4)
+B = np.random.rand(4, 4)
+C = crcw_matrix_multiplication(A, B)
+print("Matrix C after CRCW PRAM multiplication:\n", C)
+```
+
+**Time Complexity:** \( O(\log N) \)
+**Number of Processors:** \( O(N^2) \)
+
+By comparing these models, you can see how they differ in terms of time complexity and the number of processors used. Feel free to run these algorithms and adjust as needed for your assignment!
+#############################################################################################################################
+### Task 4: Scalar Product Speedup and Efficiency
+
+#### Speedup (\( S_p \)) and Efficiency (\( E_p \))
+
+**Speedup \( S_p \):**
+\[ S_p = \frac{T_s}{T_p} \]
+Where \( T_s \) is the sequential execution time and \( T_p \) is the parallel execution time.
+
+**Efficiency \( E_p \):**
+\[ E_p = \frac{S_p}{p} \]
+Where \( p \) is the number of processors.
+
+Given the data from Task 2, we can calculate the speedup and efficiency as follows:
+
+```python
+# Speedup calculation
+speedup = sequential_scalar_time / parallel_scalar_time
+# Efficiency calculation
+efficiency = speedup / 8
+
+print("Speedup (S8):", speedup)
+print("Efficiency (E8):", efficiency)
+```
+#####################################################################################################################
+### Task 5: Generalizing Speedup and Efficiency
+
+#### Generalized Formulas for \( S_p \) and \( E_p \)
+
+For a vector of length \( n \) and \( p \) processors:
+
+**Generalized Speedup \( S_p \):**
+\[ S_p(n, p) = \frac{T_s(n)}{T_p(n, p)} \]
+
+**Generalized Efficiency \( E_p \):**
+\[ E_p(n, p) = \frac{S_p(n, p)}{p} \]
+
+Where:
+- \( T_s(n) \) is the sequential time complexity \( O(n) \).
+- \( T_p(n, p) \) is the parallel time complexity, which can vary depending on the algorithm used. For example, for the CRCW PRAM model, it’s \( O(\frac{n}{p} + \log p) \).
+
+### Visualizing Speedup and Efficiency
+
+You can create plots to visualize how speedup and efficiency change with different numbers of processors:
+
+```python
+# Example: varying number of processors
+processors = np.arange(1, 17)
+speedups = sequential_scalar_time / (sequential_scalar_time / processors + parallel_scalar_time / processors)
+efficiencies = speedups / processors
+
+# Plotting speedup and efficiency
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.plot(processors, speedups, marker='o')
+plt.xlabel('Number of Processors')
+plt.ylabel('Speedup')
+plt.title('Speedup vs Number of Processors')
+
+plt.subplot(1, 2, 2)
+plt.plot(processors, efficiencies, marker='o')
+plt.xlabel('Number of Processors')
+plt.ylabel('Efficiency')
+plt.title('Efficiency vs Number of Processors')
+
+plt.tight_layout()
+plt.show()
+```
+
+These steps should help you complete tasks 3, 4, and 5. Let me know if you need further clarifications or additional code!
